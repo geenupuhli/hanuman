@@ -9,7 +9,6 @@ $(document).ready(function(){
   });
   duplicatedRepeatersOnEdit = []
 
-  updateParentRepeaterId()
   incrementRepeaterHeader()
   // run through repeater and hide delete buttons
   hideDeleteButtons()
@@ -45,6 +44,7 @@ $(document).ready(function(){
     // collect all container items inside cloned container for iteration later to update all attributes
     var containerItems = $($clonedContainer).find('.form-container-entry-item');
 
+    UpdateIdsInRepeaters($clonedContainer)
     // increment data-entry by 1 on every click
     $dataEntry = $dataEntry + 1;
 
@@ -138,7 +138,6 @@ $(document).ready(function(){
 
      }
      uniquefyEntryIds()
-     UpdateIdsInRepeaters()
 
      if ($clonedContainer.hasClass("parent-repeater-container")) {
        repeaterDataNumber = $clonedContainer.data('repeater-number')
@@ -324,41 +323,46 @@ $(document).ready(function(){
     //   $(el).after(" entry id: **** " + $(el).val())
     // })
   };;
+  function findLastRepeaterId(){
+    var largestId = 0
+    $(".repeater-ids").each(function(i,e){
+      id = parseFloat($(e).val())
+      largestId = (id > largestId) ? id : largestId
+    });
+    return largestId
+  };
 
-  function UpdateIdsInRepeaters(){
-    //  Grabbing all the parent repeater containers
-    parentRepeaters = $("input[is-parent-repeater=true]")
-    parentRepeaterId = 1000
+  function UpdateIdsInRepeaters($clonedContainer){
+    var lastRepeaterId = findLastRepeaterId()
 
-    // update all parent repeaters with unique id
-    parentRepeaters.each(function(idx, el){
-      questions = $(el).closest(".parent-repeater-container").find(".form-container-entry-item")
-
-      questions.each(function(idx, element){
-        input = $(element).find("input.parent-repeater-id")
-        input.val(parentRepeaterId)
+    if ($clonedContainer.hasClass("parent-repeater-container")) {
+      lastRepeaterId += 1
+      $clonedContainer.find('input[is-parent-repeater=true]').val(lastRepeaterId)
+      var topLevelQuestions = $clonedContainer.find('.nested-question')
+      topLevelQuestions.each(function(idx, el){
+        $(el).val(lastRepeaterId)
       });
-      $(el).val(parentRepeaterId)
-      // $(el).after("updated parent repeater id: " + parentRepeaterId + "| ")
-      parentRepeaterId += 1
-    });
 
-    // Grabbing all the children repeaters
-    childrenRepeaters = $("input[nested-child=true")
-    childrenRepeaterId = 1
+      var nestedRps = $($clonedContainer).find(".nested-repeater-container")
+      var parentRepeaterId = lastRepeaterId
+      nestedRps.each(function(idx, el){
+        $(el).find(".child-repeater-input").val(parentRepeaterId)
+        lastRepeaterId += 1
+        $(el).find(".repeater-inputs").val(lastRepeaterId)
+        var nestedQuestions = $(el).find('.nested-question')
+        nestedQuestions.each(function(idx, el){
+          $(el).val(lastRepeaterId)
+        });
+      })
 
-    // update all childer repeaters with unique id
-    childrenRepeaters.each(function(idx, el){
-      if ($(el).attr('need-parent-repeater-id') == "true") {
-        parentRepeaterContainerId = $(el).closest(".parent-repeater-container").find("input[is-parent-repeater=true]").val()
-        $(el).val(parentRepeaterContainerId)
-        // $(el).after("updated parent repeater id: " + parentRepeaterContainerId + "| ")
-      }else if ($(el).attr('repeater-id') == "true") {
-        $(el).val(childrenRepeaterId)
-        // $(el).after("updated repeater id: " + childrenRepeaterId + "| ")
-        childrenRepeaterId += 1
-      };
-    });
+    }else if ($clonedContainer.hasClass("nested-repeater-container")) {
+      lastRepeaterId += 1
+      $($clonedContainer).find(".repeater-inputs").val(lastRepeaterId)
+      var nestedQuestions = $($clonedContainer).find('.nested-question')
+      nestedQuestions.each(function(idx, el){
+        $(el).val(lastRepeaterId)
+      });
+    }
   };
 
 
