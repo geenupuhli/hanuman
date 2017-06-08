@@ -348,7 +348,7 @@ $(document).ready(function(){
       nestedRps.each(function(idx, el){
         $(el).find(".child-repeater-input").val(parentRepeaterId)
         lastRepeaterId += 1
-        $(el).find(".repeater-inputs").val(lastRepeaterId)
+        $(el).find(".repeater-update-rp-ids").val(lastRepeaterId)
         var nestedQuestions = $(el).find('.nested-question')
         nestedQuestions.each(function(idx, el){
           $(el).val(lastRepeaterId)
@@ -357,7 +357,7 @@ $(document).ready(function(){
 
     }else if ($clonedContainer.hasClass("nested-repeater-container")) {
       lastRepeaterId += 1
-      $($clonedContainer).find(".repeater-inputs").val(lastRepeaterId)
+      $($clonedContainer).find(".repeater-update-rp-ids").val(lastRepeaterId)
       var nestedQuestions = $($clonedContainer).find('.nested-question')
       nestedQuestions.each(function(idx, el){
         $(el).val(lastRepeaterId)
