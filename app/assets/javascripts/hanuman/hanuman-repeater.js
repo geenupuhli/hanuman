@@ -563,20 +563,8 @@ $(document).ready(function(){
   };
 
   function updateDom(clonedRepeater, dataEntry, parentRepeater){
-
     // setting the timeStamp for the inputs to be updated
     var timeStamp = new Date().getTime();
-
-    // update the parent repeater id input
-    parentRepeaterInput = $(parentRepeater).find('.repeater-inputs')
-    
-    if (parentRepeater.length > 0) {
-      $(parentRepeaterInput).each(function(idx, el){
-        var nameStamp = $(el).attr("name").match(/\d+/)[0];
-        var nameAttr = $(el).attr("name")
-        $(el).attr('name', nameAttr.replace(/(\d+)/, nameStamp.concat(timeStamp)))
-      })
-    }
     // begin updating all the inputs found in the cloned repeater
     for (var i = 0; i < clonedRepeater.length; i++) {
       $($(clonedRepeater[i]).find('.latlong')).attr('id', "map".concat(timeStamp));
