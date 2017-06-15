@@ -31,15 +31,8 @@ $(document).ready(function(){
     $clonedContainer = container.clone(true);
     var parentRepeater = $($clonedContainer).closest(".parent-repeater-container")
 
-    //  remove child repeaters that were added via the duplicate repeater button
-    if (parentRepeater.length > 0) {
-      var repeaterEntries = $($clonedContainer).find('.form-container-entry-item[data-entry]')
-      var current_entry = repeaterEntries.first().data('entry')
-      parentRepeater.find(".nested-repeater-container[data-entry!="+current_entry+"]").remove()
-        parentRepeater.find(".nested-repeater-container[data-entry="+current_entry+"]").each(function(idx, el){
-          $(el).find('.duplicate-form-container-repeater').show()
-        })
-    }
+    removeDuplicatedNestedRepeaters(parentRepeater)
+
     // remove hidden field observation ids
     $($clonedContainer).find('.hidden-field-observation-id').remove();
     // remove data-observation-id at the repeater level
@@ -166,6 +159,22 @@ $(document).ready(function(){
      hideDeleteButtons()
   });
 
+
+  function removeDuplicatedNestedRepeaters(parentRepeater){
+    //  remove child repeaters that were added via the duplicate repeater button
+    if (parentRepeater.length > 0) {
+      var repeaterEntries = $($clonedContainer).find('.form-container-entry-item[data-entry]')
+      var current_entry = repeaterEntries.first().data('entry')
+
+      // original children repeaters will always have the same entry id as the parent repeater, otherwise a different entry id is a sign that repeater was "added", for it should be removed
+      parentRepeater.find(".nested-repeater-container[data-entry!="+current_entry+"]").remove()
+
+      parentRepeater.find(".nested-repeater-container[data-entry="+current_entry+"]").each(function(idx, el){
+        $(el).find('.duplicate-form-container-repeater').show()
+      });
+    }
+  }
+
   function incrementRepeaterHeader() {
     repeaterCountIndex = 1
     $(".parent-repeater-container").each(function(i, el){
@@ -251,12 +260,16 @@ $(document).ready(function(){
         });
       }else {
         nested = $(el).find(".form-container-repeater")
+        var repeaterEntry = $(el).find('.form-container-entry-item[data-entry]').first()
+        var currentParentEntry = repeaterEntry.data('entry')
         nested.each(function(i, childR){
           hideDeleteButtonHelper(childR, false);
           if ( nested.length == 1 ) {
             $(childR).find('.destroy-form-container-repeater').hide()
-          }else if (i != nested.length-1 ) {
-            $(childR).find('.duplicate-form-container-repeater').hide()
+          }else if ($(childR).data('entry') == currentParentEntry) {
+            $(childR).find('.destroy-form-container-repeater').hide()
+          }else if (i != nested.length-1 && $(childR).data('entry') == currentParentEntry) {
+              $(childR).find('.duplicate-form-container-repeater').hide()
           }
         });
       };
