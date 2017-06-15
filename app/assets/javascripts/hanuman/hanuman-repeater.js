@@ -31,6 +31,15 @@ $(document).ready(function(){
     $clonedContainer = container.clone(true);
     var parentRepeater = $($clonedContainer).closest(".parent-repeater-container")
 
+    //  remove child repeaters that were added via the duplicate repeater button
+    if (parentRepeater.length > 0) {
+      var repeaterEntries = $($clonedContainer).find('.form-container-entry-item[data-entry]')
+      var current_entry = repeaterEntries.first().data('entry')
+      parentRepeater.find(".nested-repeater-container[data-entry!="+current_entry+"]").remove()
+        parentRepeater.find(".nested-repeater-container[data-entry="+current_entry+"]").each(function(idx, el){
+          $(el).find('.duplicate-form-container-repeater').show()
+        })
+    }
     // remove hidden field observation ids
     $($clonedContainer).find('.hidden-field-observation-id').remove();
     // remove data-observation-id at the repeater level
@@ -334,7 +343,6 @@ $(document).ready(function(){
 
   function UpdateIdsInRepeaters($clonedContainer){
     var lastRepeaterId = findLastRepeaterId()
-
     if ($clonedContainer.hasClass("parent-repeater-container")) {
       lastRepeaterId += 1
       $clonedContainer.find('input[is-parent-repeater=true]').val(lastRepeaterId)
