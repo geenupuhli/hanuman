@@ -305,7 +305,7 @@ module Hanuman
                   puts ""
                   puts "          ^^^^^^"
                   puts "          CURRENT_PREFIX"
-                  puts "          " + current_prefix
+                  puts "          " + current_prefix.to_s
                   puts "          vvvvvv"
                   puts ""
                   puts ""
@@ -318,7 +318,7 @@ module Hanuman
                   puts ""
                   puts "          ^^^^^^"
                   puts "          CURRENT_SUFFIX"
-                  puts "          " + current_suffix
+                  puts "          " + current_suffix.to_s
                   puts "          vvvvvv"
                   puts ""
                   puts ""
