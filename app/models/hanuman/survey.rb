@@ -55,7 +55,7 @@ module Hanuman
 
     def apply_group_sort
 
-      debug = true
+      debug = false
 
       form_container_type = []
       form_container_label = []
