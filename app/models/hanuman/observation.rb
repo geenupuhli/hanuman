@@ -39,7 +39,7 @@ module Hanuman
       .where(hanuman_survey_templates: {id: survey_template.id}, entry: entry)
     end
 
-    # Callbackas
+    # Callbacks
     before_save :strip_and_squish_answer
 
     # Delegations
@@ -48,6 +48,18 @@ module Hanuman
 
     amoeba do
       enable
+    end
+
+    # we need this method to tell us how many children exist based on group sort when rendering a show or edit page on the web
+    # the reason is ancestry children which we chain out to question to get is based on the template and as a result doesn't know how many repeated children occurred
+    # the group sort pattern combined carefully with a parent_repeater_id can tell us how many children when rendering a show or edit page so that the nesting closes properly
+    def group_sort_children
+      c = 0
+      unless group_sort.blank?
+        l = group_sort[0, group_sort.length - 4] + '%'
+        c = Observation.where('survey_id = ? AND group_sort LIKE ? AND parent_repeater_id = ?', survey_id, l, repeater_id).count
+      end
+      c
     end
 
     def step
