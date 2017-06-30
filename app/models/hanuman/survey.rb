@@ -254,81 +254,81 @@ module Hanuman
 
       # clean up entry level discrepancies with regard to repeater id and parent repeater id
 
-      self.observations.each do |o|
+      # self.observations.each do |o|
 
-        # have to check for existence of question because mobile device may be submitting a survey with a question that has since been deleted-kdh
-        unless o.question.blank?
+      #   # have to check for existence of question because mobile device may be submitting a survey with a question that has since been deleted-kdh
+      #   unless o.question.blank?
 
-          # loop through and find an observation that has a repeater id
-          unless o.repeater_id.blank?
+      #     # loop through and find an observation that has a repeater id
+      #     unless o.repeater_id.blank?
 
-            if debug
-              puts ""
-              puts ""
-              puts "^^^^^^"
-              puts "FOUND REPEATER_ID"
-              puts "o.id: " + o.id.to_s
-              puts "current_repeater_id: " + o.repeater_id.to_s
-              puts "current_group_sort: " + o.group_sort
-              puts "vvvvvv"
-              puts ""
-              puts ""
-            end
+      #       if debug
+      #         puts ""
+      #         puts ""
+      #         puts "^^^^^^"
+      #         puts "FOUND REPEATER_ID"
+      #         puts "o.id: " + o.id.to_s
+      #         puts "current_repeater_id: " + o.repeater_id.to_s
+      #         puts "current_group_sort: " + o.group_sort
+      #         puts "vvvvvv"
+      #         puts ""
+      #         puts ""
+      #       end
 
-            current_repeater_id = o.repeater_id
-            current_group_sort = o.group_sort
+      #       current_repeater_id = o.repeater_id
+      #       current_group_sort = o.group_sort
 
-            # sub loop through and find observations where there parent repeater id matched the current repeater id
-            self.observations.each do |sub_o|
-              # we have a match
-              if sub_o.parent_repeater_id == current_repeater_id
+      #       # sub loop through and find observations where there parent repeater id matched the current repeater id
+      #       self.observations.each do |sub_o|
+      #         # we have a match
+      #         if sub_o.parent_repeater_id == current_repeater_id
 
-                if debug
-                  puts ""
-                  puts ""
-                  puts "     ^^^^^^"
-                  puts "     FOUND MATCH IN SUB O LOOP"
-                  puts "     sub_o.id: " + sub_o.id.to_s
-                  puts "     sub_o.parent_repeater_id: " + sub_o.parent_repeater_id.to_s
-                  puts "     sub_o.group_sort: " + sub_o.group_sort
-                  puts "     o.group_sort: " + o.group_sort
-                  puts "     vvvvvv"
-                  puts ""
-                  puts ""
-                end
+      #           if debug
+      #             puts ""
+      #             puts ""
+      #             puts "     ^^^^^^"
+      #             puts "     FOUND MATCH IN SUB O LOOP"
+      #             puts "     sub_o.id: " + sub_o.id.to_s
+      #             puts "     sub_o.parent_repeater_id: " + sub_o.parent_repeater_id.to_s
+      #             puts "     sub_o.group_sort: " + sub_o.group_sort
+      #             puts "     o.group_sort: " + o.group_sort
+      #             puts "     vvvvvv"
+      #             puts ""
+      #             puts ""
+      #           end
 
-                # correct group sort based on parent repeater id
-                current_prefix = o.group_sort[0, o.group_sort.length - 4]
+      #           # correct group sort based on parent repeater id
+      #           current_prefix = o.group_sort[0, o.group_sort.length - 4]
 
-                if debug
-                  puts ""
-                  puts ""
-                  puts "          ^^^^^^"
-                  puts "          CURRENT_PREFIX"
-                  puts "          " + current_prefix
-                  puts "          vvvvvv"
-                  puts ""
-                  puts ""
-                end
+      #           if debug
+      #             puts ""
+      #             puts ""
+      #             puts "          ^^^^^^"
+      #             puts "          CURRENT_PREFIX"
+      #             puts "          " + current_prefix
+      #             puts "          vvvvvv"
+      #             puts ""
+      #             puts ""
+      #           end
 
-                current_suffix = sub_o.group_sort[current_prefix.length, sub_o.group_sort.length]
+      #           current_suffix = sub_o.group_sort[current_prefix.length, sub_o.group_sort.length]
 
-                if debug
-                  puts ""
-                  puts ""
-                  puts "          ^^^^^^"
-                  puts "          CURRENT_SUFFIX"
-                  puts "          " + current_suffix
-                  puts "          vvvvvv"
-                  puts ""
-                  puts ""
-                end
+      #           if debug
+      #             puts ""
+      #             puts ""
+      #             puts "          ^^^^^^"
+      #             puts "          CURRENT_SUFFIX"
+      #             puts "          " + current_suffix
+      #             puts "          vvvvvv"
+      #             puts ""
+      #             puts ""
+      #           end
 
-                sub_o.group_sort = current_prefix + current_suffix
-              end
-            end
-          end
-        end
+      #           sub_o.group_sort = current_prefix + current_suffix
+      #         end
+      #       end
+      #     end
+      #   end
       end
     end
 
