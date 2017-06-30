@@ -329,7 +329,7 @@ module Hanuman
       #       end
       #     end
       #   end
-      end
+      # end
     end
 
     def apply_group_sort_debug(observation, code_level, form_container_type, form_container_label, form_container_nesting_level, remaining_children, last_child_id, group, sort)
