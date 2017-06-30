@@ -324,7 +324,7 @@ module Hanuman
                   puts ""
                 end
 
-                o.group_sort = current_prefix + current_suffix
+                sub_o.group_sort = current_prefix + current_suffix
               end
             end
           end
