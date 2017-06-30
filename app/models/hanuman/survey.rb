@@ -18,6 +18,7 @@ module Hanuman
     validates :survey_date, presence: true
 
     before_save :apply_group_sort
+    before_save :cleanup_group_sort_nesting
 
     amoeba { enable }
 
@@ -251,15 +252,46 @@ module Hanuman
           end
         end
       end
+    end
 
-      # if the data has never been saved before indicated by the lack of a survey id then we need to save before running the fourth pass
-
-      if self.id.blank?
-        self.save
+    def apply_group_sort_debug(observation, code_level, form_container_type, form_container_label, form_container_nesting_level, remaining_children, last_child_id, group, sort)
+      indentation = ""
+      if code_level > 1
+        (1..(code_level - 1)).each do |i|
+          indentation += "      "
+        end
       end
+      puts indentation + ""
+      puts indentation + ""
+      puts indentation + "^^^^^^"
+      puts indentation + "observation.entry: " + observation.entry.to_s
+      puts indentation + "question.id: " + observation.question.id.to_s
+      puts indentation + "question.sort_order: " + observation.question.sort_order.to_s
+      puts indentation + "element_type: " + observation.question.answer_type.element_type.to_s
+      puts indentation + "ancestry: " + observation.question.ancestry.to_s
+      puts indentation + "last ancestor.id: " + observation.question.ancestry.to_s.split("/").last.to_s
+      puts indentation + "......"
+      puts indentation + "observation.repeater_id: " + observation.repeater_id.to_s
+      puts indentation + "observation.parent_repeater_id: " + observation.parent_repeater_id.to_s
+      puts indentation + "......"
+      puts indentation + "form_container_type: " + form_container_type.to_s
+      puts indentation + "form_container_label: " + form_container_label.to_s
+      puts indentation + "form_container_nesting_level: " + form_container_nesting_level.to_s
+      puts indentation + "remaining_children: " + remaining_children.to_s
+      puts indentation + "last_child_id: " + last_child_id.to_s
+      puts indentation + "group: " + group.to_s
+      puts indentation + "sort: " + sort.to_s
+      puts indentation + "vvvvvv"
+      puts indentation + ""
+      puts indentation + ""
+      puts indentation + ""
+    end
+
+    def cleanup_group_sort_nesting
+
+      debug = true
 
       # clean up entry level discrepancies with regard to repeater id and parent repeater id
-
       self.observations.each do |o|
 
         # have to check for existence of question because mobile device may be submitting a survey with a question that has since been deleted-kdh
@@ -336,39 +368,6 @@ module Hanuman
           end
         end
       end
-    end
-
-    def apply_group_sort_debug(observation, code_level, form_container_type, form_container_label, form_container_nesting_level, remaining_children, last_child_id, group, sort)
-      indentation = ""
-      if code_level > 1
-        (1..(code_level - 1)).each do |i|
-          indentation += "      "
-        end
-      end
-      puts indentation + ""
-      puts indentation + ""
-      puts indentation + "^^^^^^"
-      puts indentation + "observation.entry: " + observation.entry.to_s
-      puts indentation + "question.id: " + observation.question.id.to_s
-      puts indentation + "question.sort_order: " + observation.question.sort_order.to_s
-      puts indentation + "element_type: " + observation.question.answer_type.element_type.to_s
-      puts indentation + "ancestry: " + observation.question.ancestry.to_s
-      puts indentation + "last ancestor.id: " + observation.question.ancestry.to_s.split("/").last.to_s
-      puts indentation + "......"
-      puts indentation + "observation.repeater_id: " + observation.repeater_id.to_s
-      puts indentation + "observation.parent_repeater_id: " + observation.parent_repeater_id.to_s
-      puts indentation + "......"
-      puts indentation + "form_container_type: " + form_container_type.to_s
-      puts indentation + "form_container_label: " + form_container_label.to_s
-      puts indentation + "form_container_nesting_level: " + form_container_nesting_level.to_s
-      puts indentation + "remaining_children: " + remaining_children.to_s
-      puts indentation + "last_child_id: " + last_child_id.to_s
-      puts indentation + "group: " + group.to_s
-      puts indentation + "sort: " + sort.to_s
-      puts indentation + "vvvvvv"
-      puts indentation + ""
-      puts indentation + ""
-      puts indentation + ""
     end
 
   end
