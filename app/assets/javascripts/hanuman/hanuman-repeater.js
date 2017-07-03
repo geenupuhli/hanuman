@@ -9,7 +9,6 @@ $(document).ready(function(){
   });
   duplicatedRepeatersOnEdit = []
 
-  updateParentRepeaterId()
   incrementRepeaterHeader()
   // run through repeater and hide delete buttons
   hideDeleteButtons()
@@ -32,6 +31,8 @@ $(document).ready(function(){
     $clonedContainer = container.clone(true);
     var parentRepeater = $($clonedContainer).closest(".parent-repeater-container")
 
+    removeDuplicatedNestedRepeaters(parentRepeater)
+
     // remove hidden field observation ids
     $($clonedContainer).find('.hidden-field-observation-id').remove();
     // remove data-observation-id at the repeater level
@@ -45,6 +46,7 @@ $(document).ready(function(){
     // collect all container items inside cloned container for iteration later to update all attributes
     var containerItems = $($clonedContainer).find('.form-container-entry-item');
 
+    UpdateIdsInRepeaters($clonedContainer)
     // increment data-entry by 1 on every click
     $dataEntry = $dataEntry + 1;
 
@@ -138,7 +140,6 @@ $(document).ready(function(){
 
      }
      uniquefyEntryIds()
-     UpdateIdsInRepeaters()
 
      if ($clonedContainer.hasClass("parent-repeater-container")) {
        repeaterDataNumber = $clonedContainer.data('repeater-number')
@@ -157,6 +158,22 @@ $(document).ready(function(){
      $($clonedContainer).find(".form-container-repeater").first().find('.destroy-form-container-repeater').hide()
      hideDeleteButtons()
   });
+
+
+  function removeDuplicatedNestedRepeaters(parentRepeater){
+    //  remove child repeaters that were added via the duplicate repeater button
+    if (parentRepeater.length > 0) {
+      var repeaterEntries = $($clonedContainer).find('.form-container-entry-item[data-entry]')
+      var current_entry = repeaterEntries.first().data('entry')
+
+      // original children repeaters will always have the same entry id as the parent repeater, otherwise a different entry id is a sign that repeater was "added", for it should be removed
+      parentRepeater.find(".nested-repeater-container[data-entry!="+current_entry+"]").remove()
+
+      parentRepeater.find(".nested-repeater-container[data-entry="+current_entry+"]").each(function(idx, el){
+        $(el).find('.duplicate-form-container-repeater').show()
+      });
+    }
+  }
 
   function incrementRepeaterHeader() {
     repeaterCountIndex = 1
@@ -243,12 +260,16 @@ $(document).ready(function(){
         });
       }else {
         nested = $(el).find(".form-container-repeater")
+        var repeaterEntry = $(el).find('.form-container-entry-item[data-entry]').first()
+        var currentParentEntry = repeaterEntry.data('entry')
         nested.each(function(i, childR){
           hideDeleteButtonHelper(childR, false);
           if ( nested.length == 1 ) {
             $(childR).find('.destroy-form-container-repeater').hide()
-          }else if (i != nested.length-1 ) {
-            $(childR).find('.duplicate-form-container-repeater').hide()
+          }else if ($(childR).data('entry') == currentParentEntry) {
+            $(childR).find('.destroy-form-container-repeater').hide()
+          }else if (i != nested.length-1 && $(childR).data('entry') == currentParentEntry) {
+              $(childR).find('.duplicate-form-container-repeater').hide()
           }
         });
       };
@@ -324,41 +345,45 @@ $(document).ready(function(){
     //   $(el).after(" entry id: **** " + $(el).val())
     // })
   };;
+  function findLastRepeaterId(){
+    var largestId = 0
+    $(".repeater-ids").each(function(i,e){
+      id = parseFloat($(e).val())
+      largestId = (id > largestId) ? id : largestId
+    });
+    return largestId
+  };
 
-  function UpdateIdsInRepeaters(){
-    //  Grabbing all the parent repeater containers
-    parentRepeaters = $("input[is-parent-repeater=true]")
-    parentRepeaterId = 1000
-
-    // update all parent repeaters with unique id
-    parentRepeaters.each(function(idx, el){
-      questions = $(el).closest(".parent-repeater-container").find(".form-container-entry-item")
-
-      questions.each(function(idx, element){
-        input = $(element).find("input.parent-repeater-id")
-        input.val(parentRepeaterId)
+  function UpdateIdsInRepeaters($clonedContainer){
+    var lastRepeaterId = findLastRepeaterId()
+    if ($clonedContainer.hasClass("parent-repeater-container")) {
+      lastRepeaterId += 1
+      $clonedContainer.find('input[is-parent-repeater=true]').val(lastRepeaterId)
+      var topLevelQuestions = $clonedContainer.find('.nested-question')
+      topLevelQuestions.each(function(idx, el){
+        $(el).val(lastRepeaterId)
       });
-      $(el).val(parentRepeaterId)
-      // $(el).after("updated parent repeater id: " + parentRepeaterId + "| ")
-      parentRepeaterId += 1
-    });
 
-    // Grabbing all the children repeaters
-    childrenRepeaters = $("input[nested-child=true")
-    childrenRepeaterId = 1
+      var nestedRps = $($clonedContainer).find(".nested-repeater-container")
+      var parentRepeaterId = lastRepeaterId
+      nestedRps.each(function(idx, el){
+        $(el).find(".child-repeater-input").val(parentRepeaterId)
+        lastRepeaterId += 1
+        $(el).find(".repeater-update-rp-ids").val(lastRepeaterId)
+        var nestedQuestions = $(el).find('.nested-question')
+        nestedQuestions.each(function(idx, el){
+          $(el).val(lastRepeaterId)
+        });
+      })
 
-    // update all childer repeaters with unique id
-    childrenRepeaters.each(function(idx, el){
-      if ($(el).attr('need-parent-repeater-id') == "true") {
-        parentRepeaterContainerId = $(el).closest(".parent-repeater-container").find("input[is-parent-repeater=true]").val()
-        $(el).val(parentRepeaterContainerId)
-        // $(el).after("updated parent repeater id: " + parentRepeaterContainerId + "| ")
-      }else if ($(el).attr('repeater-id') == "true") {
-        $(el).val(childrenRepeaterId)
-        // $(el).after("updated repeater id: " + childrenRepeaterId + "| ")
-        childrenRepeaterId += 1
-      };
-    });
+    }else if ($clonedContainer.hasClass("nested-repeater-container")) {
+      lastRepeaterId += 1
+      $($clonedContainer).find(".repeater-update-rp-ids").val(lastRepeaterId)
+      var nestedQuestions = $($clonedContainer).find('.nested-question')
+      nestedQuestions.each(function(idx, el){
+        $(el).val(lastRepeaterId)
+      });
+    }
   };
 
 
@@ -559,17 +584,8 @@ $(document).ready(function(){
   };
 
   function updateDom(clonedRepeater, dataEntry, parentRepeater){
-
     // setting the timeStamp for the inputs to be updated
     var timeStamp = new Date().getTime();
-
-    // update the parent repeater id input
-    parentRepeaterInput = $(parentRepeater).find('.repeater-inputs')
-    if (parentRepeater.length > 0) {
-      var nameStamp = parentRepeaterInput.attr("name").match(/\d+/)[0];
-      var nameAttr = parentRepeaterInput.attr("name")
-      parentRepeaterInput.attr('name', nameAttr.replace(/(\d+)/, nameStamp.concat(timeStamp)))
-    }
     // begin updating all the inputs found in the cloned repeater
     for (var i = 0; i < clonedRepeater.length; i++) {
       $($(clonedRepeater[i]).find('.latlong')).attr('id', "map".concat(timeStamp));
