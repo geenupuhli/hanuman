@@ -278,6 +278,8 @@ $(document).ready(function(){
       repeaterGroup = $(parent).find(".form-container-repeater[data-question-id="+qId+"]")
       if (repeaterGroup.length == 1) {
         $(repeater).find('.destroy-form-container-repeater').hide()
+      }else{
+        $(repeaterGroup).find('.destroy-form-container-repeater').first().hide()
       }
     }
 
