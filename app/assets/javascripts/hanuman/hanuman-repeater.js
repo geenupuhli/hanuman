@@ -260,17 +260,8 @@ $(document).ready(function(){
         });
       }else {
         nested = $(el).find(".form-container-repeater")
-        var repeaterEntry = $(el).find('.form-container-entry-item[data-entry]').first()
-        var currentParentEntry = repeaterEntry.data('entry')
         nested.each(function(i, childR){
           hideDeleteButtonHelper(childR, false);
-          if ( nested.length == 1 ) {
-            $(childR).find('.destroy-form-container-repeater').hide()
-          }else if ($(childR).data('entry') == currentParentEntry) {
-            $(childR).find('.destroy-form-container-repeater').hide()
-          }else if (i != nested.length-1 && $(childR).data('entry') == currentParentEntry) {
-              $(childR).find('.duplicate-form-container-repeater').hide()
-          }
         });
       };
     });
@@ -285,6 +276,9 @@ $(document).ready(function(){
     }else {
       parent = repeater.closest(".parent-repeater-container")
       repeaterGroup = $(parent).find(".form-container-repeater[data-question-id="+qId+"]")
+      if (repeaterGroup.length == 1) {
+        $(repeater).find('.destroy-form-container-repeater').hide()
+      }
     }
 
     // then queck for duplicated repeaters and hide all the "add buttons" from repeaper EXCEPT THE LAST ONE
